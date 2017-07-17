@@ -1,4 +1,4 @@
-import { Vector3, MeshPhongMaterial, Color, PCFSoftShadowMap } from "three";
+import { Vector2, Vector3, MeshPhongMaterial, MeshBasicMaterial,  Color, PCFSoftShadowMap } from "three";
 import {
   App,
   ElementModule,
@@ -8,12 +8,14 @@ import {
   RenderingModule,
   ResizeModule,
   Sphere,
+	Torus,
   Plane,
   CameraModule,
   OrbitControlsModule,
   AmbientLight,
   PointLight,
-  TextureModule
+  TextureModule,
+	Box
 } from "whs";
 import {
   SphereModule,
@@ -28,13 +30,14 @@ function init() {
     new SceneModule(),
     new CameraModule({
       position: {
-        y: 10,
+        y: 40,
         z: 110
-      }
+      },
+			far: 100000,
     }),
     new RenderingModule(
       {
-        bgColor: 0x162129,
+        bgColor: 0xcccccc,
 
         renderer: {
           antialias: true,
@@ -46,7 +49,6 @@ function init() {
       { shadow: true }
     ),
     new ResizeModule(),
-    new OrbitControlsModule(),
     new WorldModule({
       ammo: "http://localhost:8080/ammo.js",
       gravity: new Vector3(0, -100, 0)
@@ -55,7 +57,8 @@ function init() {
 
   addSphere();
   addPlane();
-
+	addBasket();
+	addBoard();
   // point light
   // Lights
   new PointLight({
@@ -111,14 +114,14 @@ function addSphere() {
     modules: [
       new SphereModule({
         mass: 120,
-        restitution: 2
+        restitution: 3
       }),
       new TextureModule({
         url: "/textures/ball.png"
       })
     ],
 
-    position: new Vector3(0, 50, 20)
+    position: new Vector3(0, 30, 50)
   });
   sphere.addTo(app);
 }
@@ -149,6 +152,65 @@ function addPlane() {
   wall.position.z = -200;
   ground.addTo(app);
   wall.addTo(app);
+}
+
+function addBasket() {
+	new Torus({
+		geometry: {
+			buffer: true,
+			radius: 9,
+			tube: 1,
+			radialSegments: 16,
+			tubularSegments: 32
+		},
+
+		shadow: {
+			cast: false
+		},
+
+		mass: 0,
+
+		material: new MeshPhongMaterial({
+			color: 0xff0000,
+			metalness: 0.8,
+			roughness: 0.5,
+			emissive: 0xffccff,
+			emissiveIntensity: 0.2
+		}),
+
+		position: {
+			y: 60,
+			z: -150
+		},
+
+		physics: {
+			type: 'concave' // 'convex' by default.
+		},
+
+		rotation: {
+			x: Math.PI / 2
+		}
+	}).addTo(app);
+}
+
+function addBoard() {
+	new Box({
+		geometry: {
+			buffer: true,
+			width: 41,
+			depth: 1,
+			height: 28
+		},
+		modules: [
+      new TextureModule({
+        url: "/textures/wall.jpg"
+      })
+    ],
+		material: new MeshBasicMaterial({
+			color: 0xffffff,
+		}),
+		position: new Vector3(0, 68, -160),
+	}).addTo(app);
 }
 
 init();
