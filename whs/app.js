@@ -12,7 +12,8 @@ import {
   CameraModule,
   OrbitControlsModule,
   AmbientLight,
-  PointLight
+  PointLight,
+  TextureModule
 } from "whs";
 import {
   SphereModule,
@@ -59,15 +60,29 @@ function init() {
   // Lights
   new PointLight({
     light: {
-      intensity: 0.5,
-      distance: 100
+      intensity: 1,
+      distance: 100,
+      angle: Math.PI
     },
 
-    shadow: {
+    shadowmap: {
+      width: 1024,
+      height: 1024,
+
+      left: -50,
+      right: 50,
+      top: 50,
+      bottom: -50,
+
+      far: 80,
+
       fov: 90
     },
 
-    position: new Vector3(0, 10, 10)
+    position: {
+      y: 60,
+      z: -40
+    }
   }).addTo(app);
 
   // add light
@@ -95,12 +110,15 @@ function addSphere() {
 
     modules: [
       new SphereModule({
-        mass: 10,
-        restitution: 1
+        mass: 120,
+        restitution: 2
+      }),
+      new TextureModule({
+        url: "/textures/ball.png"
       })
     ],
 
-    position: new Vector3(0, 20, 80)
+    position: new Vector3(0, 50, 20)
   });
   sphere.addTo(app);
 }
@@ -118,7 +136,7 @@ function addPlane() {
       })
     ],
 
-    material: new MeshPhongMaterial({ color: 0x447f8b }),
+    material: new MeshPhongMaterial({ color: 0xcccccc }),
 
     rotation: {
       x: -Math.PI / 2

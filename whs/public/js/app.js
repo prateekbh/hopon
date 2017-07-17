@@ -44273,7 +44273,7 @@ return 7!=j(S({},"a",{get:function(){return S(this,"a",{value:7}).a}})).a})?func
 /* unused harmony export Importer */
 /* unused harmony export Octahedron */
 /* unused harmony export Parametric */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return Plane$1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return Plane$1; });
 /* unused harmony export Polyhedron */
 /* unused harmony export Ring */
 /* unused harmony export Shape */
@@ -44300,7 +44300,7 @@ return 7!=j(S({},"a",{get:function(){return S(this,"a",{value:7}).a}})).a})?func
 /* unused harmony export StateModule */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return OrbitControlsModule; });
 /* unused harmony export DynamicGeometryModule */
-/* unused harmony export TextureModule */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return TextureModule; });
 /* unused harmony export AnimationModule */
 /* unused harmony export DefineModule */
 /* unused harmony export Model */
@@ -44427,7 +44427,7 @@ var minivents_commonjs = function Events(target){
         i = list.length = func ? list.length : 0;
     while(i--) func == list[i][0] && list.splice(i,1);
   };
-  /** 
+  /**
    * Emit: send event, callbacks will be triggered
    */
   target.emit = function(type){
@@ -53464,9 +53464,11 @@ var loader = new __WEBPACK_IMPORTED_MODULE_0_three__["_30" /* TextureLoader */](
  * }).addTo(app);
  */
 var TextureModule = function () {
+	console.log('texture');
   createClass(TextureModule, null, [{
     key: 'load',
     value: function load(url) {
+			console.log('loading: ', url)
       return new TextureModule({ url: url }).textures[0][1];
     }
   }]);
@@ -150681,15 +150683,29 @@ function init() {
   // Lights
   new __WEBPACK_IMPORTED_MODULE_1_whs__["h" /* PointLight */]({
     light: {
-      intensity: 0.5,
-      distance: 100
+      intensity: 1,
+      distance: 100,
+      angle: Math.PI
     },
 
-    shadow: {
+    shadowmap: {
+      width: 1024,
+      height: 1024,
+
+      left: -50,
+      right: 50,
+      top: 50,
+      bottom: -50,
+
+      far: 80,
+
       fov: 90
     },
 
-    position: new __WEBPACK_IMPORTED_MODULE_0_three__["b" /* Vector3 */](0, 10, 10)
+    position: {
+      y: 60,
+      z: -40
+    }
   }).addTo(app);
 
   // add light
@@ -150717,18 +150733,21 @@ function addSphere() {
 
     modules: [
       new __WEBPACK_IMPORTED_MODULE_2_physics_module_ammonext__["SphereModule"]({
-        mass: 10,
-        restitution: 1
+        mass: 120,
+        restitution: 2
+      }),
+      new __WEBPACK_IMPORTED_MODULE_1_whs__["k" /* TextureModule */]({
+        url: "/textures/ball.png"
       })
     ],
 
-    position: new __WEBPACK_IMPORTED_MODULE_0_three__["b" /* Vector3 */](0, 20, 80)
+    position: new __WEBPACK_IMPORTED_MODULE_0_three__["b" /* Vector3 */](0, 50, 20)
   });
   sphere.addTo(app);
 }
 
 function addPlane() {
-  const ground = new __WEBPACK_IMPORTED_MODULE_1_whs__["k" /* Plane */]({
+  const ground = new __WEBPACK_IMPORTED_MODULE_1_whs__["l" /* Plane */]({
     geometry: {
       width: 400,
       height: 400
@@ -150740,7 +150759,7 @@ function addPlane() {
       })
     ],
 
-    material: new __WEBPACK_IMPORTED_MODULE_0_three__["c" /* MeshPhongMaterial */]({ color: 0x447f8b }),
+    material: new __WEBPACK_IMPORTED_MODULE_0_three__["c" /* MeshPhongMaterial */]({ color: 0xcccccc }),
 
     rotation: {
       x: -Math.PI / 2
