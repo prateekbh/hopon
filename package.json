@@ -25,6 +25,8 @@
     "extends": "eslint-config-synacor"
   },
   "devDependencies": {
+    "babylonjs": "^3.0.7",
+    "cannon": "^0.6.2",
     "eslint": "^4.2.0",
     "eslint-config-synacor": "^1.0.1",
     "if-env": "^1.0.0",

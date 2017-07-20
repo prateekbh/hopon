@@ -1,10 +1,10 @@
 module.exports = {
   entry: {
-   app: './whs/app.js'
+   app: './babylon/app.js'
   },
   output: {
-    path: __dirname + '/whs/public/js',
-    publicPath: '/whs/public/js/',
+    path: __dirname + '/babylon/public/js',
+    publicPath: '/babylon/public/js/',
     filename: '[name].js',
   }
 }
