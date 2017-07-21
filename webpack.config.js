@@ -1,10 +1,10 @@
 module.exports = {
   entry: {
-   app: './babylon/app.js'
+   app: './hop/app.js'
   },
   output: {
-    path: __dirname + '/babylon/public/js',
-    publicPath: '/babylon/public/js/',
+    path: __dirname + '/hop/public/js',
+    publicPath: '/hop/public/js/',
     filename: '[name].js',
   }
 }
