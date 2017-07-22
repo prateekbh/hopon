@@ -82025,7 +82025,7 @@ const ground = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Mesh"].CreateGround("gro
 const materialGround1 = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["StandardMaterial"]("texture2", scene);
 ground.receiveShadows = true;
 ground.material = materialGround1;
-materialGround1.emissiveColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](1,1,1);
+materialGround1.emissiveColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.5,0.2,1);
 
 // droping animation
 const droppingKeys = [];
@@ -82058,7 +82058,7 @@ opacityKeys.push({
 });
 
 const xPositions = [-3.5, -2.5, 0, 2.5, 3.5];
-let startPosition = -10;
+let startPosition = -16;
 //box
 for(let i=0; i<10; i++){
 	const box = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["MeshBuilder"].CreateBox('box1', {
@@ -82075,11 +82075,12 @@ for(let i=0; i<10; i++){
 	box.position.x = i===0?0:newXPosition;
 	box.position.z = startPosition;
 	box.startPosition = startPosition;
+	console.log(box.startPosition);
 	startPosition += 4;
 	if (i > 0) {
 		box.material.alpha = 0;
-		const droppingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("droppingAnimation", "position.y", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
-		const opacityAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("opacityAnimation", "material.alpha", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
+		const droppingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("droppingAnimation", "position.y", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CONSTANT);
+		const opacityAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("opacityAnimation", "material.alpha", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CONSTANT);
 
 		droppingAnimation.setKeys(Object.assign([],droppingKeys));
 		opacityAnimation.setKeys(Object.assign([],opacityKeys));
@@ -82091,14 +82092,6 @@ for(let i=0; i<10; i++){
 		}, i * 120);
 	}
 }
-
-const animationEndEvent = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](295, function(e) {
-	console.log(e)
-	const newPosition = xPositions[Math.floor(Math.random() * 4)];
-	box.position.x = newPosition;
-});
-
-//movingAnimation.addEvent(animationEndEvent);
 
 
 // setup
@@ -82114,20 +82107,24 @@ engine.runRenderLoop(function () {
 
 document.addEventListener('click', ()=>{
 	boxes.forEach((box)=>{
-		const movingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("movingAnimation", "position.z", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
+		const movingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("movingAnimation", "position.z", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CONSTANT);
 		const animationKeys = getMovementKeys(box.position.z, true);
+		const travelTime = getTravelTime(box.position.z);
+		const animationEndEvent = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](travelTime-2, function(e) {
+			addLoopedAnimation(box);
+		}, true);
+
 		movingAnimation.setKeys(animationKeys);
+		movingAnimation.addEvent(animationEndEvent);
 		box.animations = [];
 		box.animations.push(movingAnimation);
-		scene.beginAnimation(box, 0, 300, false);
+		scene.beginAnimation(box, 0, travelTime+10, false);
 	});
 });
 
 function getMovementKeys (startPoint, skipFade = false) {
 	//animation keys
-	const speed = 280/ 80;
-	const distance = startPoint - -40;
-	const time = distance * speed;
+	const time = getTravelTime(startPoint);
 	const movementKeys = [];
 	movementKeys.push({
 		frame: 0,
@@ -82140,12 +82137,42 @@ function getMovementKeys (startPoint, skipFade = false) {
 		});
 	}
 	movementKeys.push({
-		frame: time,
-		value: -40
+		frame: time+20,
+		value: -20
 	});
 
 	return movementKeys;
 }
+
+function getTravelTime(startPoint) {
+	const speed = 280/ 40;
+	const distance = startPoint - -20;
+	return distance * speed;
+}
+
+function addLoopedAnimation(box) {
+	const movingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("movingAnimation", "position.z", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
+	const droppingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("droppingAnimation", "position.y", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
+	const opacityAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("opacityAnimation", "material.alpha", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
+	box.position.z = 20;
+	movingAnimation.setKeys(getMovementKeys(box.position.z));
+	droppingAnimation.setKeys(Object.assign([],droppingKeys));
+	opacityAnimation.setKeys(Object.assign([],opacityKeys));
+
+	const animationEndEvent = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](299, function(e) {
+		const newXPosition = xPositions[Math.floor(Math.random() * 4)];
+		box.position.x = newXPosition;
+	});
+
+	movingAnimation.addEvent(animationEndEvent);
+
+	box.animations = [];
+	box.animations.push(movingAnimation);
+	box.animations.push(droppingAnimation);
+	box.animations.push(opacityAnimation);
+	scene.beginAnimation(box, 0, 300, true);
+}
+
 
 /***/ })
 /******/ ]);

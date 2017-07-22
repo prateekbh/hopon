@@ -125,7 +125,7 @@ document.addEventListener('click', ()=>{
 		const movingAnimation = new Animation("movingAnimation", "position.z", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 		const animationKeys = getMovementKeys(box.position.z, true);
 		const travelTime = getTravelTime(box.position.z);
-		const animationEndEvent = new AnimationEvent(travelTime-2, function(e) {
+		const animationEndEvent = new AnimationEvent(travelTime, function(e) {
 			addLoopedAnimation(box);
 		}, true);
 
@@ -133,7 +133,7 @@ document.addEventListener('click', ()=>{
 		movingAnimation.addEvent(animationEndEvent);
 		box.animations = [];
 		box.animations.push(movingAnimation);
-		scene.beginAnimation(box, 0, travelTime+10, false);
+		scene.beginAnimation(box, 0, travelTime, false);
 	});
 });
 
@@ -152,7 +152,7 @@ function getMovementKeys (startPoint, skipFade = false) {
 		});
 	}
 	movementKeys.push({
-		frame: time+20,
+		frame: time,
 		value: -20
 	});
 
@@ -174,7 +174,8 @@ function addLoopedAnimation(box) {
 	droppingAnimation.setKeys(Object.assign([],droppingKeys));
 	opacityAnimation.setKeys(Object.assign([],opacityKeys));
 
-	const animationEndEvent = new AnimationEvent(299, function(e) {
+	const animationEndEvent = new AnimationEvent(280, function(e) {
+		console.log('endded');
 		const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 		box.position.x = newXPosition;
 	});
