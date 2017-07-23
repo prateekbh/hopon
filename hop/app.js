@@ -19,7 +19,7 @@ import {
 	CSG,
 	Animation,
 	AnimationEvent,
-	FxaaPostProcess
+	Sound
 } from 'babylonjs';
 
 import CANNON from 'cannon';
@@ -31,7 +31,7 @@ const scene = new Scene(engine);
 const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
 let started = false;
 let renderScene = true;
-light.intensity = 0.5;
+light.intensity = 1;
 const camera = new FreeCamera("FreeCamera",new Vector3(0, 4, -22), scene);
 camera.setTarget(new Vector3(0, 1, 0));
 const sphere = MeshBuilder.CreateSphere("ball", {
@@ -39,13 +39,8 @@ const sphere = MeshBuilder.CreateSphere("ball", {
 }, scene);
 sphere.position.z = -16;
 sphere.position.y = 0.7;
-//const postProcess = new FxaaPostProcess("fxaa", 1.0, camera);
 const boxes=[];
-const ground = Mesh.CreateGround("ground1", 12, 40, 2, scene);
-const materialGround1 = new StandardMaterial("texture2", scene);
-ground.receiveShadows = true;
-ground.material = materialGround1;
-materialGround1.emissiveColor = new Color3(1,1,1);
+
 let sceneAnimations = [];
 let currentBox;
 // droping animation
@@ -70,6 +65,7 @@ opacityKeys.push({
 	value: 1
 });
 
+
 // jump animation
 const jumpKeys = [];
 let nextBox = 1;
@@ -78,24 +74,26 @@ jumpKeys.push({
 	value: 0.7
 });
 jumpKeys.push({
-	frame: 18,
-	value: 3
+	frame: 15,
+	value: 2
 });
 jumpKeys.push({
-	frame: 35,
+	frame: 30,
 	value: 0.5
 });
 jumpKeys.push({
-	frame: 40,
+	frame: 32,
 	value: 0.5
 });
 jumpKeys.push({
-	frame: 70,
-	value: -50
+	frame: 100,
+	value: -10
 });
-
 scene.enablePhysics();
 sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, scene);
+const bounce = new Sound("sound_name", "/bounce.wav", scene, () => {});
+const lost = new Sound("sound_nalost_soundme", "/lost.wav", scene, () => {});
+const lostEvent= new AnimationEvent(36, function() { lost.play()  }, false);
 const xPositions = [-3.5, -2.5, 0, 2.5, 3.5];
 let startPosition = -16;
 let jumpAnimationRef;
@@ -114,10 +112,14 @@ for(let i=0; i<10; i++){
 	boxMaterial.diffuseColor = new Color3(0.301, 0.815, 1);
 	boxMaterial.ambientColor = new Color3(0.101, 0.715, 1);
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
+	if (i > 0) {
+		box.position.x = newXPosition;
+	}
+
 	box.position.z = startPosition;
 	box.material.aplha = 0;
 	box.startPosition = startPosition;
-	startPosition += 4;
+	startPosition += 8;
 	const droppingAnimation = new Animation("droppingAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 	const opacityAnimation = new Animation("opacityAnimation", "material.alpha", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 	droppingAnimation.setKeys(Object.assign([],droppingKeys));
@@ -139,10 +141,16 @@ scene.gravity = new Vector3(0, 0, 0);
 
 
 scene.collisionsEnabled = true;
-ground.checkCollisions = true;
 sphere.checkCollisions = true;
+const materialSphere1 = new StandardMaterial("texture1", scene);
+materialSphere1.diffuseTexture = new Texture("ball.png", scene);
+sphere.material = materialSphere1;
 scene.registerBeforeRender(function () {
-	camera.position.z = sphere.position.z - 10;
+	camera.position.z = sphere.position.z - 12;
+	if(started){
+		sphere.rotation.x += 0.1;
+		sphere.rotation.y += 0.1;
+	}
 	if (currentBox && sphere.intersectsMesh(currentBox, false)) {
 		jumpAnimationRef.pause();
 		sphere.position.y =0.7;
@@ -155,6 +163,8 @@ scene.registerBeforeRender(function () {
 		sphere.animations.push(jumpAnimation);
 		sphere.animations.push(movingAnimation);
 		jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, false);
+		jumpAnimation.addEvent(lostEvent);
+		bounce.play();
 		((box)=>{
 			setTimeout(()=>{
 				moveBox(box);
@@ -166,7 +176,25 @@ engine.runRenderLoop(function () {
 	scene.render();
 });
 
+let ref;
+document.addEventListener('touchstart', e=> {
+	ref = e.touches[0].clientX
+	init();
+});
+document.addEventListener('touchmove', e=> {
+	if(ref) {
+		const shift = (e.touches[0].clientX - ref)/50;
+		requestAnimationFrame(()=>{
+			sphere.position.x = shift;
+		})
+	}
+})
+
 document.addEventListener('click', ()=>{
+	init();
+});
+
+function init() {
 	if (!started) {
 		started = true;
 		const jumpAnimation = new Animation("jumpAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -178,14 +206,23 @@ document.addEventListener('click', ()=>{
 		sphere.animations.push(jumpAnimation);
 		sphere.animations.push(movingAnimation);
 
-		jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, false);
+		jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, true);
+		jumpAnimation.addEvent(lostEvent);
+
+		((firstbox)=>{
+			setTimeout(()=>{
+				moveBox(firstbox);
+			}, 1000);
+		})(boxes[0]);
+
 		((box)=>{
 			setTimeout(()=>{
 				moveBox(box);
 			}, 1500);
-		})(currentBox)
+		})(currentBox);
+
 	}
-});
+}
 
 function getMovementKeys (currentPoint, destination) {
 	//animation keys
@@ -214,7 +251,9 @@ function getNextIntersectingBox(){
 }
 
 function moveBox(box){
+	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
+	box.position.x = newXPosition;
 	box.position.z = startPosition;
-	startPosition += 4;
+	startPosition += 8;
 	box.appearAnimation.restart();
 }
