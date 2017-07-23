@@ -82017,22 +82017,20 @@ const light = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["HemisphericLight"]("l
 let started = false;
 let renderScene = true;
 light.intensity = 0.5;
-const camera = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["ArcRotateCamera"]("ArcRotateCamera", Math.PI/2, Math.PI/2, 10, new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 4, -40), scene);
-camera.attachControl(canvas, false);
-camera.setTarget(__WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"].Zero());
-camera.applyGravity = true;
+const camera = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["FreeCamera"]("FreeCamera",new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 4, -22), scene);
+camera.setTarget(new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 1, 0));
 const sphere = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["MeshBuilder"].CreateSphere("ball", {
-	diameter: 1
+	diameter: 0.6
 }, scene);
 sphere.position.z = -16;
 sphere.position.y = 0.7;
-const postProcess = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["FxaaPostProcess"]("fxaa", 1.0, camera);
+//const postProcess = new FxaaPostProcess("fxaa", 1.0, camera);
 const boxes=[];
 const ground = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Mesh"].CreateGround("ground1", 12, 40, 2, scene);
 const materialGround1 = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["StandardMaterial"]("texture2", scene);
 ground.receiveShadows = true;
 ground.material = materialGround1;
-materialGround1.emissiveColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.5,0.2,1);
+materialGround1.emissiveColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](1,1,1);
 let sceneAnimations = [];
 let currentBox;
 // droping animation
@@ -82045,10 +82043,6 @@ droppingKeys.push({
 	frame: 20,
 	value: 0
 });
-droppingKeys.push({
-	frame: 300,
-	value: 0
-});
 
 // opacity animation
 const opacityKeys = [];
@@ -82058,10 +82052,6 @@ opacityKeys.push({
 });
 opacityKeys.push({
 	frame: 20,
-	value: 1
-});
-opacityKeys.push({
-	frame: 300,
 	value: 1
 });
 
@@ -82110,17 +82100,19 @@ for(let i=0; i<10; i++){
 	boxMaterial.ambientColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.101, 0.715, 1);
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 	box.position.z = startPosition;
+	box.material.aplha = 0;
 	box.startPosition = startPosition;
 	startPosition += 4;
-
-	if (i > 0) {
-		box.physicsImpostor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"](box, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"].BoxImpostor, { mass: 0, restitution: 0 }, scene);
-		// box.physicsImpostor.registerOnPhysicsCollide(sphere.physicsImpostor, function(main, collided) {
-		// 	console.log(jumpAnimationRef, 'pausing');
-		// 	jumpAnimationRef.pause();
-		// 	sphere.animations = [];
-		// });
-	}
+	const droppingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("droppingAnimation", "position.y", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CONSTANT);
+	const opacityAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("opacityAnimation", "material.alpha", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CONSTANT);
+	droppingAnimation.setKeys(Object.assign([],droppingKeys));
+	opacityAnimation.setKeys(Object.assign([],opacityKeys));
+	box.animations.push(droppingAnimation);
+	box.animations.push(opacityAnimation);
+	box.physicsImpostor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"](box, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"].BoxImpostor, { mass: 0, restitution: 0 }, scene);
+	setTimeout(()=>{
+		box.appearAnimation = scene.beginAnimation(box, 0, 20, false);
+	}, i* 25);
 }
 
 
@@ -82135,6 +82127,7 @@ scene.collisionsEnabled = true;
 ground.checkCollisions = true;
 sphere.checkCollisions = true;
 scene.registerBeforeRender(function () {
+	camera.position.z = sphere.position.z - 10;
 	if (currentBox && sphere.intersectsMesh(currentBox, false)) {
 		jumpAnimationRef.pause();
 		sphere.position.y =0.7;
@@ -82147,6 +82140,11 @@ scene.registerBeforeRender(function () {
 		sphere.animations.push(jumpAnimation);
 		sphere.animations.push(movingAnimation);
 		jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, false);
+		((box)=>{
+			setTimeout(()=>{
+				moveBox(box);
+			}, 1500);
+		})(currentBox)
 	}
 });
 engine.runRenderLoop(function () {
@@ -82166,12 +82164,16 @@ document.addEventListener('click', ()=>{
 		sphere.animations.push(movingAnimation);
 
 		jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, false);
+		((box)=>{
+			setTimeout(()=>{
+				moveBox(box);
+			}, 1500);
+		})(currentBox)
 	}
 });
 
 function getMovementKeys (currentPoint, destination) {
 	//animation keys
-	console.log(currentPoint, destination);
 	const movementKeys = [];
 	movementKeys.push({
 		frame: 0,
@@ -82185,36 +82187,6 @@ function getMovementKeys (currentPoint, destination) {
 	return movementKeys;
 }
 
-function getTravelTime(startPoint) {
-	const speed = 280/ 40;
-	const distance = startPoint - -20;
-	return distance * speed;
-}
-
-function addLoopedAnimation(box) {
-	const movingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("movingAnimation", "position.z", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
-	const droppingAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("droppingAnimation", "position.y", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
-	const opacityAnimation = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"]("opacityAnimation", "material.alpha", 60, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONTYPE_FLOAT, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Animation"].ANIMATIONLOOPMODE_CYCLE);
-	box.position.z = 20;
-	movingAnimation.setKeys(getMovementKeys(box.position.z));
-	droppingAnimation.setKeys(Object.assign([],droppingKeys));
-	opacityAnimation.setKeys(Object.assign([],opacityKeys));
-
-	const animationEndEvent = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](299, function(e) {
-		const newXPosition = xPositions[Math.floor(Math.random() * 4)];
-		//box.position.x = newXPosition;
-	});
-
-	movingAnimation.addEvent(animationEndEvent);
-
-	box.animations = [];
-	box.animations.push(movingAnimation);
-	box.animations.push(droppingAnimation);
-	box.animations.push(opacityAnimation);
-	sceneAnimations.push(scene.beginAnimation(box, 0, 300, true));
-}
-
-
 function getNextIntersectingBox(){
 	const nextBoxObj =  boxes[nextBox];
 
@@ -82224,6 +82196,12 @@ function getNextIntersectingBox(){
 		nextBox = 0;
 	}
 	return nextBoxObj;
+}
+
+function moveBox(box){
+	box.position.z = startPosition;
+	startPosition += 4;
+	box.appearAnimation.restart();
 }
 
 /***/ })
