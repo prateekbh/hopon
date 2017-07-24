@@ -19,25 +19,26 @@ import {
 	CSG,
 	Animation,
 	AnimationEvent,
-	Sound
+	Sound,
 } from 'babylonjs';
 
 import CANNON from 'cannon';
 window.CANNON = CANNON;
 
 const canvas = document.getElementById("stage");
-const engine = new Engine(canvas);
+const engine = new Engine(canvas, true);
 const scene = new Scene(engine);
-const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+const light = new HemisphericLight("light", new Vector3(0, 3, 0), scene);
 let started = false;
 let renderScene = true;
-light.intensity = 1;
+let shift = 0;
+light.intensity = 2.5;
 const camera = new FreeCamera("FreeCamera",new Vector3(0, 4, -22), scene);
 camera.setTarget(new Vector3(0, 1, 0));
 const sphere = MeshBuilder.CreateSphere("ball", {
 	diameter: 0.6
 }, scene);
-sphere.position.z = -16;
+sphere.position.z = -17;
 sphere.position.y = 0.7;
 const boxes=[];
 
@@ -89,19 +90,24 @@ jumpKeys.push({
 	frame: 100,
 	value: -10
 });
+scene.workerCollisions = true;
 scene.enablePhysics();
 sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, scene);
 const bounce = new Sound("sound_name", "/bounce.wav", scene, () => {});
 const lost = new Sound("sound_nalost_soundme", "/lost.wav", scene, () => {});
-const lostEvent= new AnimationEvent(36, function() { lost.play()  }, false);
-const xPositions = [-3.5, -2.5, 0, 2.5, 3.5];
+const lostEvent= new AnimationEvent(42, function() { lost.play()  }, false);
+const xPositions = [-3.5, -2.5, 0, 2.5, 3];
+const colors = [
+	new Color3(0.16, 0.36, 0.26),
+	new Color3(0.301, 0.815, 1)
+];
 let startPosition = -16;
 let jumpAnimationRef;
 //box
 for(let i=0; i<10; i++){
 	const box = MeshBuilder.CreateBox('box1', {
 		size: 2,
-		height:0.4,
+		height:0.2,
 		faceColors: new Color4(0,0,1,0.8),
 	},scene);
 	const boxMaterial = new StandardMaterial('boxMaterial', scene);
@@ -109,8 +115,7 @@ for(let i=0; i<10; i++){
 	box.checkCollisions = true;
 	box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene);
 	box.material = boxMaterial;
-	boxMaterial.diffuseColor = new Color3(0.301, 0.815, 1);
-	boxMaterial.ambientColor = new Color3(0.101, 0.715, 1);
+	boxMaterial.diffuseColor = colors[0];
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 	if (i > 0) {
 		box.position.x = newXPosition;
@@ -143,13 +148,13 @@ scene.gravity = new Vector3(0, 0, 0);
 scene.collisionsEnabled = true;
 sphere.checkCollisions = true;
 const materialSphere1 = new StandardMaterial("texture1", scene);
-materialSphere1.diffuseTexture = new Texture("ball.png", scene);
+materialSphere1.diffuseTexture = new Texture("football.jpg", scene);
 sphere.material = materialSphere1;
 scene.registerBeforeRender(function () {
 	camera.position.z = sphere.position.z - 12;
 	if(started){
 		sphere.rotation.x += 0.1;
-		sphere.rotation.y += 0.1;
+		sphere.position.x = shift*1.4;
 	}
 	if (currentBox && sphere.intersectsMesh(currentBox, false)) {
 		jumpAnimationRef.pause();
@@ -180,15 +185,12 @@ let ref;
 document.addEventListener('touchstart', e=> {
 	ref = e.touches[0].clientX
 	init();
-});
+},{passive: true});
 document.addEventListener('touchmove', e=> {
 	if(ref) {
-		const shift = (e.touches[0].clientX - ref)/50;
-		requestAnimationFrame(()=>{
-			sphere.position.x = shift;
-		})
+		shift = (e.touches[0].clientX - ref)/70;
 	}
-})
+},{passive: true})
 
 document.addEventListener('click', ()=>{
 	init();
@@ -254,6 +256,7 @@ function moveBox(box){
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 	box.position.x = newXPosition;
 	box.position.z = startPosition;
+	box.material.diffuseColor = colors[Math.floor(Math.random()*2)];
 	startPosition += 8;
 	box.appearAnimation.restart();
 }

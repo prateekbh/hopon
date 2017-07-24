@@ -74,6 +74,7 @@ displayBin.position.x = -0.3;
 displayBin.position.z = -8;
 scene.clearColor = new Color3(0.2, 0.2, 0.2);
 scene.gravity = new Vector3(0, 0, 0);
+scene.workerCollisions = true;
 scene.enablePhysics();
 sphere.physicsImpostor = new PhysicsImpostor(sphere, PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 0.9 }, scene);
 ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0.9 }, scene);

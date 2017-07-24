@@ -82011,18 +82011,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 window.CANNON = __WEBPACK_IMPORTED_MODULE_1_cannon___default.a;
 
 const canvas = document.getElementById("stage");
-const engine = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Engine"](canvas);
+const engine = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Engine"](canvas, true);
 const scene = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Scene"](engine);
-const light = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["HemisphericLight"]("light", new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 1, 0), scene);
+const light = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["HemisphericLight"]("light", new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 3, 0), scene);
 let started = false;
 let renderScene = true;
-light.intensity = 1;
+let shift = 0;
+light.intensity = 2.5;
 const camera = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["FreeCamera"]("FreeCamera",new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 4, -22), scene);
 camera.setTarget(new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 1, 0));
 const sphere = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["MeshBuilder"].CreateSphere("ball", {
 	diameter: 0.6
 }, scene);
-sphere.position.z = -16;
+sphere.position.z = -17;
 sphere.position.y = 0.7;
 const boxes=[];
 
@@ -82074,19 +82075,24 @@ jumpKeys.push({
 	frame: 100,
 	value: -10
 });
+scene.workerCollisions = true;
 scene.enablePhysics();
 sphere.physicsImpostor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"](sphere, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"].SphereImpostor, { mass: 0, restitution:0 }, scene);
 const bounce = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Sound"]("sound_name", "/bounce.wav", scene, () => {});
 const lost = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Sound"]("sound_nalost_soundme", "/lost.wav", scene, () => {});
-const lostEvent= new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](36, function() { lost.play()  }, false);
-const xPositions = [-3.5, -2.5, 0, 2.5, 3.5];
+const lostEvent= new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["AnimationEvent"](42, function() { lost.play()  }, false);
+const xPositions = [-3.5, -2.5, 0, 2.5, 3];
+const colors = [
+	new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.16, 0.36, 0.26),
+	new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.301, 0.815, 1)
+];
 let startPosition = -16;
 let jumpAnimationRef;
 //box
 for(let i=0; i<10; i++){
 	const box = __WEBPACK_IMPORTED_MODULE_0_babylonjs__["MeshBuilder"].CreateBox('box1', {
 		size: 2,
-		height:0.4,
+		height:0.2,
 		faceColors: new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color4"](0,0,1,0.8),
 	},scene);
 	const boxMaterial = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["StandardMaterial"]('boxMaterial', scene);
@@ -82094,8 +82100,7 @@ for(let i=0; i<10; i++){
 	box.checkCollisions = true;
 	box.physicsImpostor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"](box, __WEBPACK_IMPORTED_MODULE_0_babylonjs__["PhysicsImpostor"].BoxImpostor, { mass: 0, restitution: 0 }, scene);
 	box.material = boxMaterial;
-	boxMaterial.diffuseColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.301, 0.815, 1);
-	boxMaterial.ambientColor = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Color3"](0.101, 0.715, 1);
+	boxMaterial.diffuseColor = colors[0];
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 	if (i > 0) {
 		box.position.x = newXPosition;
@@ -82128,13 +82133,13 @@ scene.gravity = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Vector3"](0, 0, 0);
 scene.collisionsEnabled = true;
 sphere.checkCollisions = true;
 const materialSphere1 = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["StandardMaterial"]("texture1", scene);
-materialSphere1.diffuseTexture = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Texture"]("ball.png", scene);
+materialSphere1.diffuseTexture = new __WEBPACK_IMPORTED_MODULE_0_babylonjs__["Texture"]("football.jpg", scene);
 sphere.material = materialSphere1;
 scene.registerBeforeRender(function () {
 	camera.position.z = sphere.position.z - 12;
 	if(started){
 		sphere.rotation.x += 0.1;
-		sphere.rotation.y += 0.1;
+		sphere.position.x = shift*1.4;
 	}
 	if (currentBox && sphere.intersectsMesh(currentBox, false)) {
 		jumpAnimationRef.pause();
@@ -82165,15 +82170,12 @@ let ref;
 document.addEventListener('touchstart', e=> {
 	ref = e.touches[0].clientX
 	init();
-});
+},{passive: true});
 document.addEventListener('touchmove', e=> {
 	if(ref) {
-		const shift = (e.touches[0].clientX - ref)/50;
-		requestAnimationFrame(()=>{
-			sphere.position.x = shift;
-		})
+		shift = (e.touches[0].clientX - ref)/70;
 	}
-})
+},{passive: true})
 
 document.addEventListener('click', ()=>{
 	init();
@@ -82239,6 +82241,7 @@ function moveBox(box){
 	const newXPosition = xPositions[Math.floor(Math.random() * 4)];
 	box.position.x = newXPosition;
 	box.position.z = startPosition;
+	box.material.diffuseColor = colors[Math.floor(Math.random()*2)];
 	startPosition += 8;
 	box.appearAnimation.restart();
 }
