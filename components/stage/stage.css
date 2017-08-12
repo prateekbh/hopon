@@ -1,0 +1,10 @@
+.page{
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.stage{
+	height: 100vh;
+	widows: 100vh;
+}
