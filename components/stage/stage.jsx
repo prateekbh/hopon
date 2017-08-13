@@ -5,7 +5,9 @@ export default class Stage extends Component {
     super();
   }
 	componentDidMount(){
-
+		require.ensure('../../game/GameScene', (require) => {
+			const GameScene = require('../../game/GameScene');
+		}, 'gameengine');
 	}
   render(){
     return (

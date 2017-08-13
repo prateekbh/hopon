@@ -7,6 +7,7 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<link rel="manifest" href="/manifest.json">
+		<link rel="preload" as="script" href="/gameengine.chunk.862e8.js">
 		<% if (htmlWebpackPlugin.options.manifest.theme_color) { %>
 			<meta name="theme-color" content="<%= htmlWebpackPlugin.options.manifest.theme_color %>">
 		<% } %>
@@ -26,13 +27,6 @@
 			url: '/'
 		}) %>
 		<script defer src="<%= htmlWebpackPlugin.files.chunks['bundle'].entry %>"></script>
-		<script>
-			document.onreadystatechange = function () {
-				if (document.readyState === "interactive") {
-					initApplication();
-				}
-			}
-		</script>
 		<script>window.fetch||document.write('<script src="<%= htmlWebpackPlugin.files.chunks["polyfills"].entry %>"><\/script>')</script>
 	</body>
 </html>

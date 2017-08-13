@@ -25,6 +25,7 @@
     "extends": "eslint-config-synacor"
   },
   "devDependencies": {
+    "babylonjs": "^3.1.0-alpha1",
     "eslint": "^4.3.0",
     "eslint-config-synacor": "^1.0.1",
     "firebase": "^3.6.8",
