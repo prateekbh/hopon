@@ -6,13 +6,14 @@ export default class Stage extends Component {
   }
 	componentDidMount(){
 		require.ensure('../../game/GameScene', (require) => {
-			const GameScene = require('../../game/GameScene');
+			const GameScene = require('../../game/GameScene').default;
+			this.scene = new GameScene(this.canvas);
 		}, 'gameengine');
 	}
   render(){
     return (
       <div className={style.page}>
-				<canvas className={style.stage}/>
+				<canvas className={style.stage} ref={canvas => this.canvas = canvas}/>
       </div>
     )
   }
