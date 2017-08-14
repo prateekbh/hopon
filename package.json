@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "babylonjs": "^3.1.0-alpha1",
+    "cannon": "^0.6.2",
     "eslint": "^4.3.0",
     "eslint-config-synacor": "^1.0.1",
     "firebase": "^3.6.8",
