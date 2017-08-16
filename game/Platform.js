@@ -59,7 +59,7 @@ class Platform{
 		box.checkCollisions = true;
 		box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, this._scene);
 		box.material = boxMaterial;
-		box.material.aplha = 0;
+		box.material.alpha = 0;
 		boxMaterial.diffuseColor = Platform.colors[0];
 		this.addDroppingEffect(box);
 		return box;
