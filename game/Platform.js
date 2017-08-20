@@ -22,8 +22,12 @@ class Platform{
 	constructor(scene){
 		this._scene = scene;
 		this._boxes = [];
-		this.currentBox = null;
+		this._currentBoxIndex = 0;
 		this.addBoxes();
+	}
+
+	get boxes() {
+		return this._boxes;
 	}
 
 	addBoxes(){
@@ -35,7 +39,7 @@ class Platform{
 			this._boxes.push(box);
 			const newXPosition = Platform.PlatformXPositions[Math.floor(Math.random() * 4)];
 			if (i > 0) {
-				box.position.x = newXPosition;
+				//box.position.x = newXPosition;
 			}
 			box.position.z = startPosition;
 			box.material.aplha = 0;
@@ -73,6 +77,19 @@ class Platform{
 		box.animations.push(droppingAnimation);
 		box.animations.push(opacityAnimation);
 		box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, this._scene);
+	}
+
+	getCurrentBox() {
+		return this._boxes[this._currentBoxIndex];
+	}
+
+	getNextBox() {
+		if(this._currentBoxIndex <  9) {
+			this._currentBoxIndex++;
+		} else {
+			this._currentBoxIndex = 0;
+		}
+		return this._boxes[this._currentBoxIndex];
 	}
 }
 
