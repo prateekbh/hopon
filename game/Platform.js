@@ -39,7 +39,7 @@ class Platform{
 			this._boxes.push(box);
 			const newXPosition = Platform.PlatformXPositions[Math.floor(Math.random() * 4)];
 			if (i > 0) {
-				//box.position.x = newXPosition;
+				box.position.x = newXPosition;
 			}
 			box.position.z = startPosition;
 			box.material.aplha = 0;

@@ -19,8 +19,8 @@ class Ball{
 			new PhysicsImpostor(this._sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, this.scene);
 		this._sphere.checkCollisions = true;
 		// A jump from platform to platform is 40 frames, and will be restarted on intersection.
-		// if animation is still playing on 42nd frame you have lost the game.
-		this._lostEvent= new AnimationEvent(42, function() { lost.play()  }, false);
+		// if animation is still playing on 45th frame you have lost the game.
+		this._lostEvent= new AnimationEvent(45, function() { lost.play()  }, false);
 	}
 
 	// start an animation from current sphere's position to next destination
@@ -35,6 +35,22 @@ class Ball{
 		return this._scene.beginAnimation(this._sphere, 0, 70, true);
 	}
 
+	startSwipeAnimation(newXPosition){
+		const swipeAnimation = new Animation("swipeAnimation", "position.x", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
+		const swipAnimationKeys = [];
+		jumpAnimationKeys.push({
+			frame: 0,
+			value: this._sphere.position.x
+		});
+		jumpAnimationKeys.push({
+			frame: 60,
+			value: newXPosition
+		});
+		swipeAnimation.setKeys(swipAnimationKeys);
+		this._sphere.animations.push(swipeAnimation);
+		//return this._scene.beginAnimation(this._sphere, 0, 60, true);
+	}
+
 	getMovementKeys(destination){
 		//animation keys
 		const currentPoint = this._sphere.position.z;
@@ -44,7 +60,7 @@ class Ball{
 			value: currentPoint
 		});
 		movementKeys.push({
-			frame: 35,
+			frame: 45,
 			value: destination
 		});
 
@@ -57,6 +73,10 @@ class Ball{
 
 	get rotation() {
 		return this._sphere.rotation;
+	}
+
+	get sphere() {
+		return this._sphere;
 	}
 }
 

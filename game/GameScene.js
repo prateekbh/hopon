@@ -74,8 +74,17 @@ class GameScene {
 
 	addTouchListeners(){
 		document.addEventListener('touchstart', e => {
-			this.beginGame();
+			if (!this._gameStarted){
+				this._touchRef = e.touches[0].clientX
+				this.beginGame();
+			}
 		},{passive: true});
+
+		document.addEventListener('touchmove', e => {
+			if(this._gameStarted) {
+				this._swipeShift = (e.touches[0].clientX - this._touchRef)/70;
+			}
+		},{passive: true})
 	}
 
 	beginGame(){
@@ -85,30 +94,38 @@ class GameScene {
 	}
 
 	preAnimationCheck(){
+		const movementScale = 0.15;
 		this._camera.position.z = this._ball.position.z - 12;
 		if(this._gameStarted){
 			this._ball.rotation.x += 0.1;
+			if(this._swipeShift > 0.2) {
+				if(this._ball.position.x <= this._swipeShift) {
+					this._ball.position.x += movementScale;
+				}
+			} else if(this._swipeShift < -0.2) {
+				if(this._ball.position.x >= this._swipeShift) {
+					this._ball.position.x -= movementScale;
+				}
+			} else {
+				if (this._ball.position.x < 0) {
+					this._ball.position.x += movementScale;
+				}
+				else (this._ball.position.x > 0)
+					this._ball.position.x -= movementScale;
+			}
+			if (this._ball.sphere.intersectsMesh(this._platform.getCurrentBox(), false)) {
+				this._ballAnimationRef.stop();
+				this._ball.position.y =0.7;
+				const nextZPosition = this._platform.getNextBox().position.z;
+				this._ballAnimationRef = this._ball.startFreshAnimation(nextZPosition);
+				// bounce.play();
+				// ((box)=>{
+				// 	setTimeout(()=>{
+				// 		moveBox(box);
+				// 	}, 1500);
+				// })(currentBox)
+			}
 		}
-		// if (currentBox && sphere.intersectsMesh(currentBox, false)) {
-		// 	this._ballAnimationRef.pause();
-		// 	this._ball.position.y =0.7;
-		// 	// const jumpAnimation = new Animation("jumpAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// 	// const movingAnimation = new Animation("movingAnimation", "position.z", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// 	// jumpAnimation.setKeys(jumpKeys);
-		// 	// currentBox = getNextIntersectingBox();
-		// 	// const nextZPosition = currentBox.position.z;
-		// 	// movingAnimation.setKeys(getMovementKeys(sphere.position.z, nextZPosition));
-		// 	// sphere.animations.push(jumpAnimation);
-		// 	// sphere.animations.push(movingAnimation);
-		// 	// jumpAnimationRef = scene.beginAnimation(sphere, 0, 70, false);
-		// 	// jumpAnimation.addEvent(lostEvent);
-		// 	// bounce.play();
-		// 	// ((box)=>{
-		// 	// 	setTimeout(()=>{
-		// 	// 		moveBox(box);
-		// 	// 	}, 1500);
-		// 	// })(currentBox)
-		// }
 	}
 }
 

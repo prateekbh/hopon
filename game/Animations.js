@@ -5,15 +5,15 @@ jumpAnimationKeys.push({
 	value: 0.7
 });
 jumpAnimationKeys.push({
-	frame: 15,
+	frame: 20,
 	value: 2
 });
 jumpAnimationKeys.push({
-	frame: 30,
-	value: 0.5
+	frame: 40,
+	value: 0.6
 });
 jumpAnimationKeys.push({
-	frame: 32,
+	frame: 41,
 	value: 0.5
 });
 jumpAnimationKeys.push({
