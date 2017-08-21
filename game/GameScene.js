@@ -30,10 +30,12 @@ class GameScene {
 		this.addPlatforms();
 		this.addTouchListeners();
 		//this.loadSounds();
-		this._scene.registerBeforeRender(this.preAnimationCheck.bind(this));
+		//this._scene.registerBeforeRender(this.preAnimationCheck.bind(this));
 		engine.runRenderLoop(() => {
+			this.preAnimationCheck();
 			this._scene.render();
 		});
+		document.body.webkitRequestFullscreen();
 	}
 
 	addLoadingTasks(){
@@ -54,9 +56,8 @@ class GameScene {
 
 	addPhysics(){
 		this._scene.workerCollisions = true;
-		this._scene.enablePhysics();
-		this._scene.enablePhysics();
 		this._scene.collisionsEnabled = true;
+		this._scene.enablePhysics();
 	}
 
 	loadSounds(){
@@ -75,55 +76,59 @@ class GameScene {
 	addTouchListeners(){
 		document.addEventListener('touchstart', e => {
 			if (!this._gameStarted){
-				this._touchRef = e.touches[0].clientX
+				this._touchRef = e.touches[0].clientX;
+				this._swipeShift = 0;
 				this.beginGame();
 			}
 		},{passive: true});
 
 		document.addEventListener('touchmove', e => {
 			if(this._gameStarted) {
-				this._swipeShift = (e.touches[0].clientX - this._touchRef)/70;
+				this._swipeShift = (e.touches[0].clientX - this._touchRef)/90;
 			}
-		},{passive: true})
+		});
 	}
 
 	beginGame(){
 		const firstZPosition = this._platform.getNextBox().position.z;
 		this._gameStarted = true;
 		this._ballAnimationRef = this._ball.startFreshAnimation(firstZPosition);
+		((box)=>{
+			setTimeout(()=>{
+				this._platform.moveBox(box);
+			}, 1500);
+		})(this._platform._boxes[0]);
 	}
 
 	preAnimationCheck(){
-		const movementScale = 0.15;
+		const movementScale = Math.abs(this._swipeShift - this._ball.position.x)/5;
 		this._camera.position.z = this._ball.position.z - 12;
 		if(this._gameStarted){
 			this._ball.rotation.x += 0.1;
-			if(this._swipeShift > 0.2) {
-				if(this._ball.position.x <= this._swipeShift) {
-					this._ball.position.x += movementScale;
+			requestAnimationFrame(()=>{
+				if(this._swipeShift > 0) {
+					if(this._ball.position.x <= this._swipeShift) {
+						this._ball.position.x += movementScale;
+					}
+				} else if(this._swipeShift < 0) {
+					if(this._ball.position.x >= this._swipeShift) {
+						this._ball.position.x -= movementScale;
+					}
 				}
-			} else if(this._swipeShift < -0.2) {
-				if(this._ball.position.x >= this._swipeShift) {
-					this._ball.position.x -= movementScale;
-				}
-			} else {
-				if (this._ball.position.x < 0) {
-					this._ball.position.x += movementScale;
-				}
-				else (this._ball.position.x > 0)
-					this._ball.position.x -= movementScale;
-			}
-			if (this._ball.sphere.intersectsMesh(this._platform.getCurrentBox(), false)) {
+			});
+			const currentBox = this._platform.getCurrentBox();
+			if (this._ball.sphere.intersectsMesh(currentBox, false)) {
 				this._ballAnimationRef.stop();
 				this._ball.position.y =0.7;
+				//this._touchRef = this._ball.position.x;
 				const nextZPosition = this._platform.getNextBox().position.z;
 				this._ballAnimationRef = this._ball.startFreshAnimation(nextZPosition);
-				// bounce.play();
-				// ((box)=>{
-				// 	setTimeout(()=>{
-				// 		moveBox(box);
-				// 	}, 1500);
-				// })(currentBox)
+				//bounce.play();
+				((box)=>{
+					setTimeout(()=>{
+						this._platform.moveBox(box);
+					}, 1500);
+				})(currentBox)
 			}
 		}
 	}

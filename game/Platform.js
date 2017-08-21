@@ -13,7 +13,7 @@ import {
 } from 'babylonjs';
 import {droppingAnimationKeys, opacityAnimationKeys} from './Animations';
 class Platform{
-	static PlatformXPositions = [-3.5, -2.5, 0, 2.5, 3];
+	static PlatformXPositions = [-3, -2.5, 0, 2.5, 3];
 	static colors = [
 		new Color3(0.16, 0.36, 0.26),
 		new Color3(0.301, 0.815, 1)
@@ -23,6 +23,7 @@ class Platform{
 		this._scene = scene;
 		this._boxes = [];
 		this._currentBoxIndex = 0;
+		this._startPosition = -16;
 		this.addBoxes();
 	}
 
@@ -31,7 +32,6 @@ class Platform{
 	}
 
 	addBoxes(){
-		let startPosition = -16;
 		let jumpAnimationRef;
 		// add 10 boxes
 		for(let i=0; i<10; i++){
@@ -41,15 +41,15 @@ class Platform{
 			if (i > 0) {
 				box.position.x = newXPosition;
 			}
-			box.position.z = startPosition;
+			box.position.z = this._startPosition;
 			box.material.aplha = 0;
-			box.startPosition = startPosition;
+			box.startPosition = this._startPosition;
 			((index)=>{
 				setTimeout(()=>{
 					box.appearAnimation = this._scene.beginAnimation(box, 0, 20, false);
 				}, i * 50);
 			})(i);
-			startPosition += 8;
+			this._startPosition += 8;
 		}
 	}
 
@@ -90,6 +90,14 @@ class Platform{
 			this._currentBoxIndex = 0;
 		}
 		return this._boxes[this._currentBoxIndex];
+	}
+
+	moveBox(box) {
+		const newXPosition = Platform.PlatformXPositions[Math.floor(Math.random() * 4)];
+		box.position.x = newXPosition;
+		box.position.z = this._startPosition;
+		this._startPosition += 8;
+		box.appearAnimation.restart();
 	}
 }
 
