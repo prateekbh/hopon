@@ -18,7 +18,7 @@ class GameScene {
 
 	constructor(canvas){
 		window.CANNON = CANNON;
-		const engine = new Engine(canvas);
+		const engine = new Engine(canvas, true);
 		this._scene = new Scene(engine);
 		this._canvas = canvas;
 		this._scene.clearColor  = new Color3(255, 255, 255);
@@ -86,7 +86,7 @@ class GameScene {
 			if(this._gameStarted) {
 				this._swipeShift = (e.touches[0].clientX - this._touchRef)/90;
 			}
-		});
+		},{passive: true});
 	}
 
 	beginGame(){
@@ -105,22 +105,22 @@ class GameScene {
 		this._camera.position.z = this._ball.position.z - 12;
 		if(this._gameStarted){
 			this._ball.rotation.x += 0.1;
-			requestAnimationFrame(()=>{
-				if(this._swipeShift > 0) {
-					if(this._ball.position.x <= this._swipeShift) {
-						this._ball.position.x += movementScale;
-					}
-				} else if(this._swipeShift < 0) {
-					if(this._ball.position.x >= this._swipeShift) {
-						this._ball.position.x -= movementScale;
-					}
-				}
-			});
+			this._ball.position.x = this._swipeShift * 1.4;
+			// requestAnimationFrame(()=>{
+			// 	if(this._swipeShift > 0) {
+			// 		if(this._ball.position.x <= this._swipeShift) {
+			// 			this._ball.position.x += movementScale;
+			// 		}
+			// 	} else if(this._swipeShift < 0) {
+			// 		if(this._ball.position.x >= this._swipeShift) {
+			// 			this._ball.position.x -= movementScale;
+			// 		}
+			// 	}
+			// });
 			const currentBox = this._platform.getCurrentBox();
-			if (this._ball.sphere.intersectsMesh(currentBox, false)) {
+			if (this._ball.position.y < 0.8 && this._ball.sphere.intersectsMesh(currentBox, false)) {
 				this._ballAnimationRef.stop();
 				this._ball.position.y =0.7;
-				//this._touchRef = this._ball.position.x;
 				const nextZPosition = this._platform.getNextBox().position.z;
 				this._ballAnimationRef = this._ball.startFreshAnimation(nextZPosition);
 				//bounce.play();

@@ -3,6 +3,7 @@ import {
 	PhysicsImpostor,
 	Texture,
 	Animation,
+	StandardMaterial,
 } from 'babylonjs';
 
 import {jumpAnimationKeys} from './Animations';
@@ -15,12 +16,20 @@ class Ball{
 		}, scene);
 		this._sphere.position.z = -17;
 		this._sphere.position.y = 0.7;
+
+		// Setup physics
 		this._sphere.physicsImpostor =
 			new PhysicsImpostor(this._sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, this.scene);
 		this._sphere.checkCollisions = true;
+
+		// Add texture to ball
+		const materialSphere1 = new StandardMaterial("texture1", this._scene);
+		materialSphere1.diffuseTexture = new Texture("football.jpg", this._scene);
+		this._sphere.material = materialSphere1;
+
 		// A jump from platform to platform is 40 frames, and will be restarted on intersection.
 		// if animation is still playing on 45th frame you have lost the game.
-		this._lostEvent= new AnimationEvent(45, function() { lost.play()  }, false);
+		this._lostEvent= new AnimationEvent(42, function() { lost.play()  }, false);
 	}
 
 	// start an animation from current sphere's position to next destination
@@ -60,7 +69,7 @@ class Ball{
 			value: currentPoint
 		});
 		movementKeys.push({
-			frame: 45,
+			frame: 35,
 			value: destination
 		});
 

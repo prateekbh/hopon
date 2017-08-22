@@ -13,7 +13,7 @@ export default class Stage extends Component {
   render(){
     return (
       <div className={style.page}>
-				<canvas className={style.stage} ref={canvas => this.canvas = canvas}/>
+				<canvas id="stage" className={style.stage} ref={canvas => this.canvas = canvas}/>
       </div>
     )
   }

@@ -7,7 +7,7 @@ import Stage from 'async!./components/stage/stage.jsx';
 export default class App extends Component {
   render() {
     return (
-      <div>
+      <div class='app'>
         <Router>
           <Route component={Home} path="/"></Route>
 					<Route component={Stage} path="/play"></Route>
