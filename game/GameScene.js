@@ -84,7 +84,7 @@ class GameScene {
 
 		document.addEventListener('touchmove', e => {
 			if(this._gameStarted) {
-				this._swipeShift = (e.touches[0].clientX - this._touchRef)/90;
+				this._swipeShift = (e.touches[0].clientX - this._touchRef)/80;
 			}
 		},{passive: true});
 	}
@@ -101,21 +101,31 @@ class GameScene {
 	}
 
 	preAnimationCheck(){
-		const movementScale = Math.abs(this._swipeShift - this._ball.position.x)/5;
+		const movementScale = Math.abs(this._swipeShift - this._ball.position.x)/4.5;
 		this._camera.position.z = this._ball.position.z - 12;
 		if(this._gameStarted){
 			this._ball.rotation.x += 0.1;
-			this._ball.position.x = this._swipeShift * 1.4;
+			//this._ball.position.x = this._swipeShift * 1.4;
 			// requestAnimationFrame(()=>{
-			// 	if(this._swipeShift > 0) {
-			// 		if(this._ball.position.x <= this._swipeShift) {
-			// 			this._ball.position.x += movementScale;
-			// 		}
-			// 	} else if(this._swipeShift < 0) {
-			// 		if(this._ball.position.x >= this._swipeShift) {
-			// 			this._ball.position.x -= movementScale;
-			// 		}
-			// 	}
+				if(this._swipeShift > 0) {
+					if(this._ball.position.x <= this._swipeShift) {
+						this._ball.position.x += movementScale;
+					} else {
+						this._ball.position.x -= movementScale;
+					}
+				} else if(this._swipeShift < 0) {
+					if(this._ball.position.x >= this._swipeShift) {
+						this._ball.position.x -= movementScale;
+					} else {
+						this._ball.position.x += movementScale;
+					}
+				} else {
+					if(this._ball.position.x < 0) {
+						this._ball.position.x += movementScale;
+					} else if(this._ball.position.x > 0) {
+						this._ball.position.x -= movementScale;
+					}
+				}
 			// });
 			const currentBox = this._platform.getCurrentBox();
 			if (this._ball.position.y < 0.8 && this._ball.sphere.intersectsMesh(currentBox, false)) {
