@@ -1,25 +1,28 @@
 // jump animation
-const jumpAnimationKeys = [];
-jumpAnimationKeys.push({
-	frame: 0,
-	value: 0.7
-});
-jumpAnimationKeys.push({
-	frame: 15,
-	value: 2
-});
-jumpAnimationKeys.push({
-	frame: 30,
-	value: 0.6
-});
-jumpAnimationKeys.push({
-	frame: 32,
-	value: 0.5
-});
-jumpAnimationKeys.push({
-	frame: 100,
-	value: -10
-});
+function getJumpAnimationKeys(gameSpeed) {
+	const jumpAnimationKeys = [];
+	jumpAnimationKeys.push({
+		frame: 0,
+		value: 0.7
+	});
+	jumpAnimationKeys.push({
+		frame: Math.floor(gameSpeed / 2),
+		value: 2
+	});
+	jumpAnimationKeys.push({
+		frame: gameSpeed,
+		value: 0.6
+	});
+	jumpAnimationKeys.push({
+		frame: gameSpeed + 2,
+		value: 0.5
+	});
+	jumpAnimationKeys.push({
+		frame: 100,
+		value: -10
+	});
+	return jumpAnimationKeys;
+}
 
 // opacity animation
 const opacityAnimationKeys = [];
@@ -42,4 +45,4 @@ droppingAnimationKeys.push({
 	value: 0
 });
 
-export {jumpAnimationKeys, opacityAnimationKeys, droppingAnimationKeys};
+export {getJumpAnimationKeys, opacityAnimationKeys, droppingAnimationKeys};

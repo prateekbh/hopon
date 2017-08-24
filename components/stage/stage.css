@@ -4,7 +4,20 @@
 }
 
 .stage{
-	height: 95%;
+	position: absolute;
+	z-index: 1;
+	height: 100%;
 	width: 100%;
+	bottom: 0px;
 	outline: 0px;
+}
+
+.score{
+	position: absolute;
+	z-index: 2;
+	text-align: center;
+	width: 100%;
+	top: 5%;
+	pointer-events: none;
+	user-select: none;
 }

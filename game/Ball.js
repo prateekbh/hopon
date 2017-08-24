@@ -6,7 +6,7 @@ import {
 	StandardMaterial,
 } from 'babylonjs';
 
-import {jumpAnimationKeys} from './Animations';
+import {getJumpAnimationKeys} from './Animations';
 
 class Ball{
 	constructor(scene){
@@ -21,6 +21,7 @@ class Ball{
 		this._sphere.physicsImpostor =
 			new PhysicsImpostor(this._sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, this.scene);
 		this._sphere.checkCollisions = true;
+		this.gameSpeed = 30;
 
 		// Add texture to ball
 		const materialSphere1 = new StandardMaterial("texture1", this._scene);
@@ -36,28 +37,12 @@ class Ball{
 	startFreshAnimation(nextZPosition){
 		const jumpAnimation = new Animation("jumpAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 		const movingAnimation = new Animation("movingAnimation", "position.z", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-		jumpAnimation.setKeys(jumpAnimationKeys);
+		jumpAnimation.setKeys(getJumpAnimationKeys(this.gameSpeed));
 		jumpAnimation.addEvent(this._lostEvent);	// event listener for game lost
 		movingAnimation.setKeys(this.getMovementKeys(nextZPosition));
 		this._sphere.animations.push(jumpAnimation);
 		this._sphere.animations.push(movingAnimation);
 		return this._scene.beginAnimation(this._sphere, 0, 70, true);
-	}
-
-	startSwipeAnimation(newXPosition){
-		const swipeAnimation = new Animation("swipeAnimation", "position.x", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
-		const swipAnimationKeys = [];
-		jumpAnimationKeys.push({
-			frame: 0,
-			value: this._sphere.position.x
-		});
-		jumpAnimationKeys.push({
-			frame: 60,
-			value: newXPosition
-		});
-		swipeAnimation.setKeys(swipAnimationKeys);
-		this._sphere.animations.push(swipeAnimation);
-		//return this._scene.beginAnimation(this._sphere, 0, 60, true);
 	}
 
 	getMovementKeys(destination){
@@ -69,7 +54,7 @@ class Ball{
 			value: currentPoint
 		});
 		movementKeys.push({
-			frame: 35,
+			frame: this.gameSpeed + 5,
 			value: destination
 		});
 
