@@ -18,13 +18,14 @@ import Ball from './Ball';
 import Platform from './Platform';
 class GameScene {
 
-	constructor(canvas, {onScore, onInit}){
+	constructor(canvas, {onScore, onInit, onFinish}){
 		window.CANNON = CANNON;
 		this._engine = new Engine(canvas, true);
 		this._scene = new Scene(this._engine);
 		this._canvas = canvas;
 		this._onScore = onScore;
 		this._onInit = onInit;
+		this._onFinish = onFinish;
 		this._scene.clearColor  = new Color3(255, 255, 255);
 		this._sounds = {};
 		this.addPhysics();
@@ -36,7 +37,7 @@ class GameScene {
 		this.addTouchListeners();
 		//this.loadSounds();
 		// allow moderate degradation
-		SceneOptimizer.OptimizeAsync(this._scene)
+		//SceneOptimizer.OptimizeAsync(this._scene)
 	}
 
 	addLoadingTasks(){
@@ -95,6 +96,9 @@ class GameScene {
 
 	addBall(){
 		this._ball = new Ball(this._scene);
+		this._ball.registerOnFinishCallback(() => {
+			this._onFinish && this._onFinish();
+		});
 	}
 
 	addPlatforms(){
@@ -102,22 +106,22 @@ class GameScene {
 	}
 
 	addTouchListeners(){
-		document.addEventListener('touchstart', e => {
+		this._canvas.addEventListener('touchstart', e => {
 			if (!this._gameStarted){
 				this._touchRef = e.touches[0].clientX;
 				this._swipeShift = 0;
-				this.beginGame();
+				this.beginPlay();
 			}
 		},{passive: true});
 
-		document.addEventListener('touchmove', e => {
+		this._canvas.addEventListener('touchmove', e => {
 			if(this._gameStarted) {
 				this._swipeShift = (e.touches[0].clientX - this._touchRef)/80;
 			}
 		},{passive: true});
 	}
 
-	beginGame(){
+	beginPlay(){
 		const firstZPosition = this._platform.getNextBox().position.z;
 		this._gameStarted = true;
 		this._ballAnimationRef = this._ball.startFreshAnimation(firstZPosition);

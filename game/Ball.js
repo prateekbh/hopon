@@ -44,6 +44,8 @@ class Ball{
 		const lostEvent= new AnimationEvent(this.gameSpeed + 10, () => {
 			this._losingSound && this._losingSound.play();
 			this._losingSound = null;
+			this._finishCallback && this._finishCallback();
+			this._finishCallback = null;
 		}, false);
 		const jumpAnimation = new Animation("jumpAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 		const movingAnimation = new Animation("movingAnimation", "position.z", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -79,6 +81,9 @@ class Ball{
 		this._losingSound = sound;
 	}
 
+	registerOnFinishCallback(finishCallback) {
+		this._finishCallback = finishCallback;
+	}
 	get position() {
 		return this._sphere.position;
 	}

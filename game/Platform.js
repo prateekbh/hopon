@@ -1,6 +1,5 @@
 import {
 	Vector3,
-	Color3,
 	Mesh,
 	MeshBuilder,
 	PhysicsImpostor,
@@ -15,8 +14,8 @@ import {droppingAnimationKeys, opacityAnimationKeys} from './Animations';
 class Platform{
 	static PlatformXPositions = [-3, -2.5, 0, 2.5, 3];
 	static colors = [
-		new Color3(0.16, 0.36, 0.26),
-		new Color3(0.301, 0.815, 1)
+		new Color4(0.16, 0.36, 0.26, 1),
+		new Color4(0.301, 0.815, 1, 1),
 	];
 
 	constructor(scene){
@@ -57,7 +56,7 @@ class Platform{
 		const box = MeshBuilder.CreateBox('box1', {
 			size: 2,
 			height:0.2,
-			faceColors: new Color4(0,0,1,0.8),
+			faceColors: Color4(0.301, 0.815, 1, 1),
 		}, this._scene);
 		const boxMaterial = new StandardMaterial('boxMaterial', this._scene);
 		box.checkCollisions = true;
