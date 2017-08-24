@@ -51,7 +51,7 @@ class GameScene {
 			this._ball.addTexture(task.image);
 		}
 
-		const bounceSoundTask = assetsManager.addImageTask("bounce sound task", "/images/basketball.png");
+		const bounceSoundTask = assetsManager.addImageTask("bounce sound task", "/sounds/bounce.wav");
 		bounceSoundTask.onSuccess = (task) => {
 			console.log(task);
 			debugger;
