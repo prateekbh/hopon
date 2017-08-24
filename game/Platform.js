@@ -14,8 +14,13 @@ import {droppingAnimationKeys, opacityAnimationKeys} from './Animations';
 class Platform{
 	static PlatformXPositions = [-3, -2.5, 0, 2.5, 3];
 	static colors = [
-		new Color4(0.16, 0.36, 0.26, 1),
-		new Color4(0.301, 0.815, 1, 1),
+		Color4.FromInts(76,175,80,1),
+		Color4.FromInts(3,169,244,1),
+		Color4.FromInts(255,193,7,1),
+		Color4.FromInts(103,58,183,1),
+		Color4.FromInts(233,30,99,1),
+		Color4.FromInts(244,67,54,1),
+		Color4.FromInts(96,125,139,1),
 	];
 
 	constructor(scene){
@@ -56,7 +61,7 @@ class Platform{
 		const box = MeshBuilder.CreateBox('box1', {
 			size: 2,
 			height:0.2,
-			faceColors: Color4(0.301, 0.815, 1, 1),
+			faceColors: Color4(0.16, 0.36, 0.26, 1),
 		}, this._scene);
 		const boxMaterial = new StandardMaterial('boxMaterial', this._scene);
 		box.checkCollisions = true;
@@ -97,6 +102,14 @@ class Platform{
 		box.position.z = this._startPosition;
 		this._startPosition += 8;
 		box.appearAnimation.restart();
+	}
+
+	changeBoxColors(){
+		console.log('changing');
+		const newColor = Platform.colors[Math.floor(Math.random() * Platform.colors.length)];
+		this._boxes.forEach(box=>{
+			box.material.diffuseColor = newColor;
+		})
 	}
 }
 

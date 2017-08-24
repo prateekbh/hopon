@@ -135,6 +135,7 @@ class GameScene {
 
 	increaseGameSpeed(){
 		this._ball.gameSpeed -= 3;
+		this._platform.changeBoxColors();
 	}
 
 	preAnimationCheck(){
