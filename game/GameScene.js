@@ -9,7 +9,9 @@ import {
 	CannonJSPlugin,
 	Mesh,
 	Color3,
-	Sound
+	Sound,
+	SceneOptimizer,
+	AssetsManager
 } from 'babylonjs';
 import CANNON from 'cannon';
 import Ball from './Ball';
@@ -25,14 +27,15 @@ class GameScene {
 		this._onInit = onInit;
 		this._scene.clearColor  = new Color3(255, 255, 255);
 		this.addPhysics();
-		this.addLoadingTasks();
 		this.addLights();
 		this.addCamera();
 		this.addBall();
+		this.addLoadingTasks();
 		this.addPlatforms();
 		this.addTouchListeners();
 		//this.loadSounds();
-		//this._scene.registerBeforeRender(this.preAnimationCheck.bind(this));
+		// allow moderate degradation
+		SceneOptimizer.OptimizeAsync(this._scene)
 		engine.runRenderLoop(() => {
 			this.preAnimationCheck();
 			this._scene.render();
@@ -40,12 +43,31 @@ class GameScene {
 	}
 
 	addLoadingTasks(){
-		// Todo: implement loading
+		const assetsManager = new AssetsManager(this._scene);
+		const textureLoaded = false;
+		const soundsLoaded = false;
+		const imageTask = assetsManager.addImageTask("texture task", "/images/basketball.png");
+		imageTask.onSuccess = (task) => {
+			this._ball.addTexture(task.image);
+		}
+
+		const bounceSoundTask = assetsManager.addImageTask("bounce sound task", "/images/basketball.png");
+		bounceSoundTask.onSuccess = (task) => {
+			console.log(task);
+			debugger;
+		}
+
+		// const lostSoundTask = assetsManager.addImageTask("lost sound task", "/images/basketball.png");
+		// imageTask.onSuccess = (task) => {
+		// 	this._ball.addTexture(task.image);
+		// }
+
+		assetsManager.load();
 	}
 
 	addLights(){
 		const light = new HemisphericLight("light", new Vector3(0, 1, 0), this._scene);
-		light.intensity = 0.5;
+		light.intensity = 1;
 	}
 
 	addCamera(){
@@ -107,29 +129,10 @@ class GameScene {
 	}
 
 	preAnimationCheck(){
-		const movementScale = Math.abs(this._swipeShift - this._ball.position.x)/4.5;
 		this._camera.position.z = this._ball.position.z - 12;
 		if(this._gameStarted){
-			this._ball.rotation.x += 0.1;
-			if(this._swipeShift > 0) {
-				if(this._ball.position.x <= this._swipeShift) {
-					this._ball.position.x += movementScale;
-				} else {
-					this._ball.position.x -= movementScale;
-				}
-			} else if(this._swipeShift < 0) {
-				if(this._ball.position.x >= this._swipeShift) {
-					this._ball.position.x -= movementScale;
-				} else {
-					this._ball.position.x += movementScale;
-				}
-			} else {
-				if(this._ball.position.x < 0) {
-					this._ball.position.x += movementScale;
-				} else if(this._ball.position.x > 0) {
-					this._ball.position.x -= movementScale;
-				}
-			}
+			this._ball.rotation.x += 0.05;
+			this.adjustBallPosition();
 			const currentBox = this._platform.getCurrentBox();
 			if (this._ball.position.y < 0.8 && this._ball.sphere.intersectsMesh(currentBox, false)) {
 				this._ballAnimationRef.stop();
@@ -143,6 +146,32 @@ class GameScene {
 						this._platform.moveBox(box);
 					}, 1500);
 				})(currentBox)
+			}
+		}
+	}
+
+	/*
+	*	Function to make ball react to the swipe of the user
+	*/
+	adjustBallPosition(){
+		const movementScale = Math.abs(this._swipeShift - this._ball.position.x)/4.5;
+		if(this._swipeShift > 0) {
+			if(this._ball.position.x <= this._swipeShift) {
+				this._ball.position.x += movementScale;
+			} else {
+				this._ball.position.x -= movementScale;
+			}
+		} else if(this._swipeShift < 0) {
+			if(this._ball.position.x >= this._swipeShift) {
+				this._ball.position.x -= movementScale;
+			} else {
+				this._ball.position.x += movementScale;
+			}
+		} else {
+			if(this._ball.position.x < 0) {
+				this._ball.position.x += movementScale;
+			} else if(this._ball.position.x > 0) {
+				this._ball.position.x -= movementScale;
 			}
 		}
 	}
