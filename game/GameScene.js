@@ -20,12 +20,13 @@ class GameScene {
 
 	constructor(canvas, {onScore, onInit}){
 		window.CANNON = CANNON;
-		const engine = new Engine(canvas, true);
-		this._scene = new Scene(engine);
+		this._engine = new Engine(canvas, true);
+		this._scene = new Scene(this._engine);
 		this._canvas = canvas;
 		this._onScore = onScore;
 		this._onInit = onInit;
 		this._scene.clearColor  = new Color3(255, 255, 255);
+		this._sounds = {};
 		this.addPhysics();
 		this.addLights();
 		this.addCamera();
@@ -36,10 +37,6 @@ class GameScene {
 		//this.loadSounds();
 		// allow moderate degradation
 		SceneOptimizer.OptimizeAsync(this._scene)
-		engine.runRenderLoop(() => {
-			this.preAnimationCheck();
-			this._scene.render();
-		});
 	}
 
 	addLoadingTasks(){
@@ -51,16 +48,22 @@ class GameScene {
 			this._ball.addTexture(task.image);
 		}
 
-		const bounceSoundTask = assetsManager.addImageTask("bounce sound task", "/sounds/bounce.wav");
+		const bounceSoundTask = assetsManager.addBinaryFileTask("bounce sound task", "/sounds/bounce.wav");
 		bounceSoundTask.onSuccess = (task) => {
-			console.log(task);
-			debugger;
+			this._sounds.bounce = new Sound("bounce", task.data, this._scene, ()=>{});
 		}
 
-		// const lostSoundTask = assetsManager.addImageTask("lost sound task", "/images/basketball.png");
-		// imageTask.onSuccess = (task) => {
-		// 	this._ball.addTexture(task.image);
-		// }
+		const lostSoundTask = assetsManager.addImageTask("lost sound task", "/images/basketball.png");
+		lostSoundTask.onSuccess = (task) => {
+			this._sounds.lost = new Sound("lost", task.data, this._scene, ()=>{});
+		}
+
+		assetsManager.onFinish = (tasks) => {
+			this._engine.runRenderLoop(() => {
+				this.preAnimationCheck();
+				this._scene.render();
+			});
+		};
 
 		assetsManager.load();
 	}
@@ -140,7 +143,7 @@ class GameScene {
 				const nextZPosition = this._platform.getNextBox().position.z;
 				this._ballAnimationRef = this._ball.startFreshAnimation(nextZPosition);
 				this._onScore();
-				//bounce.play();
+				this._sounds.bounce && this._sounds.bounce.play();
 				((box)=>{
 					setTimeout(()=>{
 						this._platform.moveBox(box);
