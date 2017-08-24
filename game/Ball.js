@@ -4,6 +4,7 @@ import {
 	Texture,
 	Animation,
 	StandardMaterial,
+	AnimationEvent,
 } from 'babylonjs';
 
 import {getJumpAnimationKeys} from './Animations';
@@ -22,10 +23,6 @@ class Ball{
 			new PhysicsImpostor(this._sphere, PhysicsImpostor.SphereImpostor, { mass: 0, restitution:0 }, this.scene);
 		this._sphere.checkCollisions = true;
 		this.gameSpeed = 30;
-
-		// A jump from platform to platform is 40 frames, and will be restarted on intersection.
-		// if animation is still playing on 45th frame you have lost the game.
-		this._lostEvent= new AnimationEvent(42, function() { lost.play()  }, false);
 	}
 
 	addTexture(image){
@@ -44,13 +41,18 @@ class Ball{
 
 	// start an animation from current sphere's position to next destination
 	startFreshAnimation(nextZPosition){
+		const lostEvent= new AnimationEvent(this.gameSpeed + 10, () => {
+			this._losingSound && this._losingSound.play();
+			this._losingSound = null;
+		}, false);
 		const jumpAnimation = new Animation("jumpAnimation", "position.y", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 		const movingAnimation = new Animation("movingAnimation", "position.z", 60, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CONSTANT);
 		jumpAnimation.setKeys(getJumpAnimationKeys(this.gameSpeed));
-		jumpAnimation.addEvent(this._lostEvent);	// event listener for game lost
+		jumpAnimation.addEvent(lostEvent);	// event listener for game lost
 		movingAnimation.setKeys(this.getMovementKeys(nextZPosition));
 		this._sphere.animations.push(jumpAnimation);
 		this._sphere.animations.push(movingAnimation);
+		this._bounceSound.play();
 		return this._scene.beginAnimation(this._sphere, 0, 70, true);
 	}
 
@@ -66,8 +68,15 @@ class Ball{
 			frame: this.gameSpeed + 5,
 			value: destination
 		});
-
 		return movementKeys;
+	}
+
+	addBouncingSound(sound) {
+		this._bounceSound = sound;
+	}
+
+	addLosingSound(sound) {
+		this._losingSound = sound;
 	}
 
 	get position() {

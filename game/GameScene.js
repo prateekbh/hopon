@@ -50,12 +50,14 @@ class GameScene {
 
 		const bounceSoundTask = assetsManager.addBinaryFileTask("bounce sound task", "/sounds/bounce.wav");
 		bounceSoundTask.onSuccess = (task) => {
-			this._sounds.bounce = new Sound("bounce", task.data, this._scene, ()=>{});
+			const bouncingSound = new Sound("bounce", task.data, this._scene, ()=>{});
+			this._ball.addBouncingSound(bouncingSound);
 		}
 
-		const lostSoundTask = assetsManager.addImageTask("lost sound task", "/images/basketball.png");
+		const lostSoundTask = assetsManager.addBinaryFileTask("lost sound task", "/sounds/lost.wav");
 		lostSoundTask.onSuccess = (task) => {
-			this._sounds.lost = new Sound("lost", task.data, this._scene, ()=>{});
+			const losingSound = new Sound("lost", task.data, this._scene, ()=>{});
+			this._ball.addLosingSound(losingSound);
 		}
 
 		assetsManager.onFinish = (tasks) => {
@@ -143,7 +145,6 @@ class GameScene {
 				const nextZPosition = this._platform.getNextBox().position.z;
 				this._ballAnimationRef = this._ball.startFreshAnimation(nextZPosition);
 				this._onScore();
-				this._sounds.bounce && this._sounds.bounce.play();
 				((box)=>{
 					setTimeout(()=>{
 						this._platform.moveBox(box);
