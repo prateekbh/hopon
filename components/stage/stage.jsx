@@ -19,9 +19,6 @@ export default class Stage extends Component {
 		}
 	}
 	initGame() {
-		this.setState({
-			score: 0,
-		});
 		require.ensure('../../game/GameScene', (require) => {
 			const GameScene = require('../../game/GameScene').default;
 			this.scene = new GameScene(this.canvas, {
@@ -59,6 +56,9 @@ export default class Stage extends Component {
 				<Fab
 					className={this.state.isPlaying? style.fab: style.fab+' '+style.appear}
 					onClick={()=>{
+						this.setState({
+							score: 0,
+						});
 						this.initGame();
 					}}>
 					<svg fill="#FFFFFF" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">

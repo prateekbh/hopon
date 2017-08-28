@@ -55,7 +55,7 @@ class Ball{
 		this._sphere.animations.push(jumpAnimation);
 		this._sphere.animations.push(movingAnimation);
 		this._bounceSound.play();
-		return this._scene.beginAnimation(this._sphere, 0, 70, true);
+		return this._scene.beginAnimation(this._sphere, 0, 100, true);
 	}
 
 	getMovementKeys(destination){
