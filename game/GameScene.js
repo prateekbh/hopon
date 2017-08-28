@@ -115,10 +115,11 @@ class GameScene {
 		},{passive: true});
 
 		this._canvas.addEventListener('touchmove', e => {
+			e.preventDefault();
 			if(this._gameStarted) {
 				this._swipeShift = (e.touches[0].clientX - this._touchRef)/80;
 			}
-		},{passive: true});
+		});
 	}
 
 	beginPlay(){

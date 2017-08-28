@@ -37,3 +37,9 @@
 .fab.appear{
 	opacity: 1;
 }
+
+.progress {
+	position: absolute;
+	top: 50%;
+	width: 100%;
+}

@@ -6,18 +6,15 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="keywords" content="progressive web game, game, addictive game">
 		<link rel="manifest" href="/manifest.json">
-		<link rel="prefetch" type="script" href="/gameengine.chunk.f920f.js">
 		<% if (htmlWebpackPlugin.options.manifest.theme_color) { %>
 			<meta name="theme-color" content="<%= htmlWebpackPlugin.options.manifest.theme_color %>">
 		<% } %>
 		<% for (var chunk of webpack.chunks) { %>
-		 <% if (chunk.names.length === 1 && chunk.names[0] === 'polyfills') continue; %>
 			<% for (var file of chunk.files) { %>
-				<% if (htmlWebpackPlugin.options.preload && file.match(/\.(js|css)$/)) { %>
-					<link rel="preload" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>">
-				<% } else if (file.match(/manifest\.json$/)) { %>
-					<link rel="manifest" href="<%= htmlWebpackPlugin.files.publicPath + file %>">
+				<% if (file.match(/gameengine/) && file.match(/\.(js)$/)) { %>
+					<link rel="prefetch" href="<%= htmlWebpackPlugin.files.publicPath + file %>">
 				<% } %>
 			<% } %>
 		<% } %>
