@@ -15,7 +15,9 @@
 			<% for (var file of chunk.files) { %>
 				<% if (file.match(/gameengine/) && file.match(/\.(js)$/)) { %>
 					<link rel="prefetch" href="<%= htmlWebpackPlugin.files.publicPath + file %>">
-				<% } %>
+				<% } else if(file.match(/0.chunk/) && file.match(/\.(js)$/)) { %>
+					<link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.publicPath + file %>">
+				<% }%>
 			<% } %>
 		<% } %>
 	</head>

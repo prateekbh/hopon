@@ -5,9 +5,12 @@ export default function (config) {
     staticFileGlobs: [
       'build/*.css',
       'build/*.js',
+			'build/*.html',
+			'build/assets/logo.png',
     ],
     stripPrefix: 'build/',
-		minify: false,
+		minify: true,
+		navigateFallback: 'index.html',
     runtimeCaching: [{
       urlPattern: /.(wav|png)/,
       handler: 'cacheFirst'
