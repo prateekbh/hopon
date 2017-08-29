@@ -5,23 +5,25 @@ export default function (config) {
     staticFileGlobs: [
       'build/*.css',
       'build/*.js',
-			'build/*.html',
-			'build/assets/logo.png',
+      'build/*.html',
+      'build/assets/logo.png',
     ],
     stripPrefix: 'build/',
-		minify: true,
-		navigateFallback: 'index.html',
+    minify: true,
+    navigateFallback: 'index.html',
     runtimeCaching: [{
       urlPattern: /.(wav|png)/,
       handler: 'cacheFirst'
     }],
-		filename: 'sw.js',
-		staticFileGlobsIgnorePatterns: [
-			/polyfills(\..*)?\.js$/,
-			/\.map$/,
-			/push-manifest\.json$/,
-			/.DS_Store/
-		]
+    filename: 'sw.js',
+    clientsClaim: true,
+    skipWaiting: true,
+    staticFileGlobsIgnorePatterns: [
+      /polyfills(\..*)?\.js$/,
+      /\.map$/,
+      /push-manifest\.json$/,
+      /.DS_Store/
+    ]
   };
 
   return preactCliSwPrecachePlugin(config, precacheConfig);

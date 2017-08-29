@@ -53,7 +53,6 @@ export default class Home extends Component {
                   this.dialog.MDComponent.show();
                 }}> Continue as guests</Button>
             <Dialog ref={(dialog)=>{
-                console.log(this);
                 this.dialog = dialog;
               }}>
               <Dialog.Header>Please tell us your name</Dialog.Header>

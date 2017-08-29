@@ -6,7 +6,7 @@
   "scripts": {
     "test": "eslint . && preact test",
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "preact build --template template.html --no-prerender && cp -R sounds/ build/sounds && cp -R images/ build/images",
+    "build": "preact build --template template.html && cp -R sounds/ build/sounds && cp -R images/ build/images",
     "serve": "preact build && preact serve",
     "dev": "preact watch"
   },
