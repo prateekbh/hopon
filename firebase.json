@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": ".",
+    "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -12,12 +12,12 @@
         "destination": "/index.html"
       }
     ],
-		"headers": [{
-			"source" : "**/*.@(jpg|jpeg|gif|png)",
-			"headers" : [ {
-				"key" : "Cache-Control",
-				"value" : "max-age=31536000"
-			} ]
-		}]
+    "headers": [{
+      "source" : "**/*.@(css|js|png)",
+      "headers" : [ {
+        "key" : "Cache-Control",
+        "value" : "max-age=31536000"
+      } ]
+    }]
   }
 }
