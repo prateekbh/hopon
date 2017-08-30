@@ -43,3 +43,14 @@
 	top: 50%;
 	width: 100%;
 }
+
+.swipeGesture{
+	position: absolute;
+	z-index: 4;
+	left: 0;
+	right: 0;
+	margin: auto;
+	bottom: 10%;
+	width: 150px;
+	pointer-events: none;
+}

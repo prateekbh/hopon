@@ -73,6 +73,7 @@ export default class Stage extends Component {
 				<div className={style.progress}>
 					<LinearProgress indeterminate={true} />
 				</div>}
+				{!this.state.isPlaying && <img src="http://gifimgs.com/res/0817/59a6d86b71750796101844.gif" className={style.swipeGesture}/>}
 				<Fab
 					className={this.state.isPlaying? style.fab: style.fab+' '+style.appear}
 					onClick={()=>{
