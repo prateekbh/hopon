@@ -33,12 +33,16 @@ export default class Home extends Component {
     });
   }
   componentDidMount(){
-    firebaseLoader.then((initFirebase)=>{
-      this.initFirebase = initFirebase;
-      this.setState({
-        firebaseLoading: false
-      });
-    });
+		if (localStorage.uname) {
+			route('/play', true);
+		} else {
+			firebaseLoader.then((initFirebase)=>{
+				this.initFirebase = initFirebase;
+				this.setState({
+					firebaseLoading: false
+				});
+			});
+		}
   }
   render(){
     return (

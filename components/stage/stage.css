@@ -13,7 +13,7 @@
 	outline: 0px;
 }
 
-.score{
+.scoreContainer{
 	position: absolute;
 	z-index: 2;
 	text-align: center;

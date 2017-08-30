@@ -12,6 +12,8 @@ export default class Stage extends Component {
 			score: '',
 			isPlaying: true,
 			isLoaded: false,
+			isFinished: false,
+			highScore: localStorage.highscore
 		};
   }
 	componentDidMount(){
@@ -40,16 +42,20 @@ export default class Stage extends Component {
 					onInit : () => {
 						this.setState({
 							score: 0,
-							isPlaying: true
+							isPlaying: true,
+							isFinished: false,
 						});
 					},
 					onFinish: () => {
-						const highScore = 0 || localStorage.highscore;
+						const highScore = localStorage.highscore || 0;
+						console.log('hs', highScore, this.state.score);
 						if(this.state.score > highScore) {
 							localStorage.highscore = this.state.score;
 						}
 						this.setState({
-							isPlaying: false
+							isFinished: true,
+							isPlaying: false,
+							highScore: localStorage.highscore || this.state.score,
 						});
 					}
 				});
@@ -59,7 +65,10 @@ export default class Stage extends Component {
   render(){
     return (
       <div className={style.page}>
-				<div className={style.score + ' mdc-typography--display2'}>{this.state.score}</div>
+				<div className={style.scoreContainer}>
+					<div className="mdc-typography--display2">{this.state.score}</div>
+					{this.state.isFinished && <div className="mdc-typography--body">High score - {this.state.highScore}</div>}
+				</div>
 				{!this.state.isLoaded &&
 				<div className={style.progress}>
 					<LinearProgress indeterminate={true} />
