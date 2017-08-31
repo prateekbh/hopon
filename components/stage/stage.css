@@ -51,6 +51,28 @@
 	right: 0;
 	margin: auto;
 	bottom: 10%;
-	width: 150px;
+	width: 75px;
 	pointer-events: none;
+	animation-name: swipegesture;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+	will-change: transform;
+}
+
+@keyframes swipegesture{
+	0%{
+		transform: translateX(0px);
+	}
+	25%{
+		transform: translateX(-100px);
+	}
+	50%{
+		transform: translateX(0px);
+	}
+	75%{
+		transform: translateX(100px);
+	}
+	100%{
+		transform: translateX(0px);
+	}
 }
