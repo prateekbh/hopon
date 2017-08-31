@@ -6,13 +6,17 @@ import 'preact-material-components/LinearProgress/style.css';
 import 'preact-material-components/Fab/style.css';
 import style from './stage.css';
 export default class Stage extends Component {
+	static GameState = {
+		'NOTLOADED': 0,
+		'READY': 1,
+		'PLAYING': 2,
+		'FINISHED': 3
+	}
   constructor(){
     super();
 		this.state = {
 			score: '',
-			isPlaying: true,
-			isLoaded: false,
-			isFinished: false,
+			gameState: Stage.GameState.NOTLOADED,
 			highScore: localStorage.highscore
 		};
   }
@@ -26,7 +30,7 @@ export default class Stage extends Component {
 	initGame() {
 		require.ensure('../../game/GameScene', (require) => {
 			this.setState({
-				isLoaded: true
+				gameState: Stage.GameState.READY
 			}, () => {
 				const GameScene = require('../../game/GameScene').default;
 				this.scene = new GameScene(this.canvas, {
@@ -42,19 +46,16 @@ export default class Stage extends Component {
 					onInit : () => {
 						this.setState({
 							score: 0,
-							isPlaying: true,
-							isFinished: false,
+							gameState: Stage.GameState.PLAYING
 						});
 					},
 					onFinish: () => {
 						const highScore = localStorage.highscore || 0;
-						console.log('hs', highScore, this.state.score);
 						if(this.state.score > highScore) {
 							localStorage.highscore = this.state.score;
 						}
 						this.setState({
-							isFinished: true,
-							isPlaying: false,
+							gameState: Stage.GameState.FINISHED,
 							highScore: localStorage.highscore || this.state.score,
 						});
 					}
@@ -67,18 +68,19 @@ export default class Stage extends Component {
       <div className={style.page}>
 				<div className={style.scoreContainer}>
 					<div className="mdc-typography--display2">{this.state.score}</div>
-					{this.state.isFinished && <div className="mdc-typography--body">High score - {this.state.highScore}</div>}
+					{this.state.gameState == Stage.GameState.FINISHED && <div className="mdc-typography--body">High score - {this.state.highScore}</div>}
 				</div>
 				{!this.state.isLoaded &&
 				<div className={style.progress}>
 					<LinearProgress indeterminate={true} />
 				</div>}
-				{!this.state.isPlaying && <img src="http://gifimgs.com/res/0817/59a6d86b71750796101844.gif" className={style.swipeGesture}/>}
+				{this.state.gameState == Stage.GameState.READY && <img src="http://gifimgs.com/res/0817/59a6d86b71750796101844.gif" className={style.swipeGesture}/>}
 				<Fab
-					className={this.state.isPlaying? style.fab: style.fab+' '+style.appear}
+					className={this.state.gameState == Stage.GameState.FINISHED?style.fab+' '+style.appear: style.fab}
 					onClick={()=>{
 						this.setState({
 							score: 0,
+							isReady: true,
 						});
 						this.initGame();
 					}}>
@@ -87,7 +89,7 @@ export default class Stage extends Component {
 							<path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
 					</svg>
 				</Fab>
-				{this.state.isLoaded && <canvas id="stage"
+				{this.state.gameState !== Stage.GameState.NOTLOADED && <canvas id="stage"
 					className={style.stage}
 					ref={canvas => this.canvas = canvas}/> }
       </div>
